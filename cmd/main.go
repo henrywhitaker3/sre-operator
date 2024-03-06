@@ -35,6 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	configurationv1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
+	"github.com/henrywhitaker3/sre-operator/internal/app"
 	"github.com/henrywhitaker3/sre-operator/internal/controller"
 	//+kubebuilder:scaffold:imports
 )
@@ -57,6 +58,8 @@ func main() {
 	var probeAddr string
 	var secureMetrics bool
 	var enableHTTP2 bool
+	var apiAddr string
+	flag.StringVar(&apiAddr, "api-bind-address", ":3000", "The address the api endpoints binds to.")
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
@@ -122,10 +125,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	app := app.NewApp(apiAddr)
+
 	if err = (&controller.WebhookReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
+	}).SetupWithManager(mgr, app); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Webhook")
 		os.Exit(1)
 	}
@@ -137,6 +142,11 @@ func main() {
 	}
 	if err := mgr.AddReadyzCheck("readyz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up ready check")
+		os.Exit(1)
+	}
+
+	if err := mgr.Add(app.Http); err != nil {
+		setupLog.Error(err, "unable to set up http api")
 		os.Exit(1)
 	}
 

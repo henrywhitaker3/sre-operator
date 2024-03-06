@@ -22,10 +22,9 @@ import (
 
 // WebhookSpec defines the desired state of Webhook
 type WebhookSpec struct {
-	// The path of the webhook. Optional, if you don't specify one
-	// it will be generated for you. If you don't set an ID, then this will
-	// change each time the operator is restarted.
-	ID string `json:"id,omitempty"`
+	// The ID/path of the webhook
+	//+kubebuilder:validation.Required
+	ID string `json:"id"`
 
 	// The secret to validate incoming webhooks with. Not implemented yet.
 	Secret string `json:"secret,omitempty"`

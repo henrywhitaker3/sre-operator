@@ -23,8 +23,10 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	configurationv1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
+	"github.com/henrywhitaker3/sre-operator/internal/app"
 	"github.com/henrywhitaker3/sre-operator/internal/controller/handlers"
 )
 
@@ -32,6 +34,7 @@ import (
 type WebhookReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	app    *app.App
 }
 
 //+kubebuilder:rbac:groups=configuration.sre.henrywhitaker.com,resources=webhooks,verbs=get;list;watch;create;update;patch;delete
@@ -41,13 +44,19 @@ type WebhookReconciler struct {
 func (r *WebhookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 
-	h := handlers.NewWebhookHandler(ctx, r.Client, req)
-	return handlers.RunHandler(l, h)
+	h := handlers.NewWebhookHandler(ctx, r.Client, req, r.app.HookStore)
+	res, err := handlers.RunHandler(l, h)
+	if err != nil {
+		l.Error(err, "webhook handler error")
+	}
+	return res, err
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *WebhookReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *WebhookReconciler) SetupWithManager(mgr ctrl.Manager, app *app.App) error {
+	r.app = app
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&configurationv1alpha1.Webhook{}).
+		WithEventFilter(predicate.GenerationChangedPredicate{}).
 		Complete(r)
 }

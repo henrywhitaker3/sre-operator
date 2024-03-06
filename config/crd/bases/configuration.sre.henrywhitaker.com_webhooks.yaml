@@ -40,15 +40,14 @@ spec:
             description: WebhookSpec defines the desired state of Webhook
             properties:
               id:
-                description: |-
-                  The path of the webhook. Optional, if you don't specify one
-                  it will be generated for you. If you don't set an ID, then this will
-                  change each time the operator is restarted.
+                description: The ID/path of the webhook
                 type: string
               secret:
                 description: The secret to validate incoming webhooks with. Not implemented
                   yet.
                 type: string
+            required:
+            - id
             type: object
           status:
             description: WebhookStatus defines the observed state of Webhook

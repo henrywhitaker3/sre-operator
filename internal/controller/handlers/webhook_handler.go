@@ -2,12 +2,17 @@ package handlers
 
 import (
 	"context"
+	"errors"
 
-	"github.com/google/uuid"
 	configurationv1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
+	"github.com/henrywhitaker3/sre-operator/internal/http/webhook"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+)
+
+var (
+	ErrMissingID = errors.New("id is missing from spec field")
 )
 
 type WebhookHandler struct {
@@ -15,16 +20,18 @@ type WebhookHandler struct {
 	client client.Client
 	req    ctrl.Request
 	obj    *configurationv1alpha1.Webhook
+	store  *webhook.Store
 
 	// The generated id
 	id string
 }
 
-func NewWebhookHandler(ctx context.Context, client client.Client, req ctrl.Request) *WebhookHandler {
+func NewWebhookHandler(ctx context.Context, client client.Client, req ctrl.Request, store *webhook.Store) *WebhookHandler {
 	return &WebhookHandler{
 		ctx:    ctx,
 		client: client,
 		req:    req,
+		store:  store,
 	}
 }
 
@@ -37,16 +44,15 @@ func (h *WebhookHandler) Get() error {
 	return nil
 }
 
-func (h *WebhookHandler) CreateOrUpdate() error {
-	h.id = uuid.NewString()
-	// TODO: add webhook the echo configuration
-	if !controllerutil.ContainsFinalizer(h.obj, fn) {
-		controllerutil.AddFinalizer(h.obj, fn)
-		if err := h.client.Update(h.ctx, h.obj); err != nil {
-			return err
-		}
+func (h *WebhookHandler) CreateOrUpdate() (error, bool) {
+	if h.obj.Spec.ID == "" {
+		return ErrMissingID, false
 	}
-	return nil
+	h.id = h.obj.Spec.ID
+
+	h.store.Store(h.id)
+
+	return nil, true
 }
 
 func (h *WebhookHandler) Delete() error {
@@ -58,8 +64,9 @@ func (h *WebhookHandler) DeletionTimestampIsZero() bool {
 	return h.obj.DeletionTimestamp.IsZero()
 }
 
-func (h *WebhookHandler) GetFinalizers() []string {
-	return h.obj.Finalizers
+func (h *WebhookHandler) AddFinalizer(fn string) error {
+	controllerutil.AddFinalizer(h.obj, fn)
+	return h.client.Update(h.ctx, h.obj)
 }
 
 func (h *WebhookHandler) RemoveFinalizer(fn string) error {
