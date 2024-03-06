@@ -2,4 +2,5 @@
 resources:
 - v1alpha1_webhook.yaml
 - v1alpha1_rollout.yaml
+- _v1alpha1_script.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

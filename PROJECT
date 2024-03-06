@@ -24,4 +24,12 @@ resources:
   kind: Rollout
   path: github.com/henrywhitaker3/sre-operator/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: sre.henrywhitaker.com
+  kind: Script
+  path: github.com/henrywhitaker3/sre-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"
