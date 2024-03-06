@@ -12,7 +12,7 @@ metadata:
   name: webhook-viewer-role
 rules:
 - apiGroups:
-  - configuration.sre.henrywhitaker.com
+  - sre.henrywhitaker.com
   resources:
   - webhooks
   verbs:
@@ -20,7 +20,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - configuration.sre.henrywhitaker.com
+  - sre.henrywhitaker.com
   resources:
   - webhooks/status
   verbs:

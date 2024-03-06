@@ -1,4 +1,4 @@
-apiVersion: configuration.sre.henrywhitaker.com/v1alpha1
+apiVersion: sre.henrywhitaker.com/v1alpha1
 kind: Webhook
 metadata:
   labels:

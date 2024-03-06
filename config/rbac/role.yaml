@@ -5,7 +5,33 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - configuration.sre.henrywhitaker.com
+  - sre.sre.henrywhitaker.com
+  resources:
+  - rollouts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sre.sre.henrywhitaker.com
+  resources:
+  - rollouts/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - sre.sre.henrywhitaker.com
+  resources:
+  - rollouts/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sre.sre.henrywhitaker.com
   resources:
   - webhooks
   verbs:
@@ -17,13 +43,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - configuration.sre.henrywhitaker.com
+  - sre.sre.henrywhitaker.com
   resources:
   - webhooks/finalizers
   verbs:
   - update
 - apiGroups:
-  - configuration.sre.henrywhitaker.com
+  - sre.sre.henrywhitaker.com
   resources:
   - webhooks/status
   verbs:

@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.14.0
-  name: webhooks.configuration.sre.henrywhitaker.com
+  name: rollouts.sre.henrywhitaker.com
 spec:
-  group: configuration.sre.henrywhitaker.com
+  group: sre.henrywhitaker.com
   names:
-    kind: Webhook
-    listKind: WebhookList
-    plural: webhooks
-    singular: webhook
+    kind: Rollout
+    listKind: RolloutList
+    plural: rollouts
+    singular: rollout
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Webhook is the Schema for the webhooks API
+        description: Rollout is the Schema for the rollouts API
         properties:
           apiVersion:
             description: |-
@@ -37,31 +37,15 @@ spec:
           metadata:
             type: object
           spec:
-            description: WebhookSpec defines the desired state of Webhook
+            description: RolloutSpec defines the desired state of Rollout
             properties:
-              id:
-                description: The ID/path of the webhook
+              foo:
+                description: Foo is an example field of Rollout. Edit rollout_types.go
+                  to remove/update
                 type: string
-              secret:
-                description: The secret to validate incoming webhooks with. Not implemented
-                  yet.
-                type: string
-            required:
-            - id
             type: object
           status:
-            description: WebhookStatus defines the observed state of Webhook
-            properties:
-              enabled:
-                description: Whether the Webhhok configuration is valid and has been
-                  processed.
-                type: boolean
-              id:
-                description: The ID id of the webhook
-                type: string
-            required:
-            - enabled
-            - id
+            description: RolloutStatus defines the observed state of Rollout
             type: object
         type: object
     served: true

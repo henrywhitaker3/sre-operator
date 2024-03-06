@@ -35,6 +35,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	configurationv1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
+	srev1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
 	"github.com/henrywhitaker3/sre-operator/internal/app"
 	"github.com/henrywhitaker3/sre-operator/internal/controller"
 	//+kubebuilder:scaffold:imports
@@ -49,6 +50,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(configurationv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(srev1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -132,6 +134,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr, app); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Webhook")
+		os.Exit(1)
+	}
+	if err = (&controller.RolloutReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Rollout")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
