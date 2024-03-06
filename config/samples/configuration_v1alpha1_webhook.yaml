@@ -1,0 +1,12 @@
+apiVersion: configuration.sre.henrywhitaker.com/v1alpha1
+kind: Webhook
+metadata:
+  labels:
+    app.kubernetes.io/name: webhook
+    app.kubernetes.io/instance: webhook-sample
+    app.kubernetes.io/part-of: sre-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: sre-operator
+  name: webhook-sample
+spec:
+  # TODO(user): Add fields here
