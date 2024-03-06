@@ -21,3 +21,14 @@ controllerManager:
   serviceAccount:
     annotations: {}
 kubernetesClusterDomain: cluster.local
+sreOperator:
+  ports:
+  - name: http
+    port: 3000
+    protocol: TCP
+    targetPort: 3000
+  - name: metrics
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  type: ClusterIP
