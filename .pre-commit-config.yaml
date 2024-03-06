@@ -3,7 +3,9 @@ repos:
     rev: v4.5.0
     hooks:
       - id: trailing-whitespace
+        exclude: chart/
       - id: end-of-file-fixer
+        exclude: chart/
       - id: check-yaml
         exclude: chart/|config/
       - id: check-added-large-files
