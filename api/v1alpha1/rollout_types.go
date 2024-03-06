@@ -20,14 +20,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
-// RolloutSpec defines the desired state of Rollout
-type RolloutSpec struct {
-	//+kubebuilder:validation:Required
-	Hook string `json:"hook"`
-
+type TargetSpec struct {
 	//+kubebuilder:validation:Required
 	//+kubebuilder:validation:Enum:deployment;statefulset;daemonset
 	Kind string `json:"kind"`
@@ -37,6 +30,15 @@ type RolloutSpec struct {
 
 	//+kubebuilder:validation:Required
 	Name string `json:"name"`
+}
+
+// RolloutSpec defines the desired state of Rollout
+type RolloutSpec struct {
+	//+kubebuilder:validation:Required
+	Hook string `json:"hook"`
+
+	//+kubebuilder:validation:Required
+	Target TargetSpec `json:"target"`
 
 	//+kubebuilder:validation:Required
 	//+kubebuilder:validation:Enum:pause;restart;resume;undo
@@ -45,7 +47,7 @@ type RolloutSpec struct {
 
 // RolloutStatus defines the observed state of Rollout
 type RolloutStatus struct {
-	Registered bool   `json:"registered"`
+	Registered bool   `json:"registered,omitempty"`
 	Error      string `json:"error,omitempty"`
 }
 

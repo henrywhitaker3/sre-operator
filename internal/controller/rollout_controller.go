@@ -25,12 +25,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	v1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
+	"github.com/henrywhitaker3/sre-operator/internal/app"
+	"github.com/henrywhitaker3/sre-operator/internal/controller/handlers"
 )
 
 // RolloutReconciler reconciles a Rollout object
 type RolloutReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	app    *app.App
 }
 
 //+kubebuilder:rbac:groups=sre.henrywhitaker.com,resources=rollouts,verbs=get;list;watch;create;update;patch;delete
@@ -39,15 +42,15 @@ type RolloutReconciler struct {
 //+kubebuilder:rbac:groups=apps;extensions,resources=deployments;pods;statefulsets;daemonsets,verbs=get;patch
 
 func (r *RolloutReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	l := log.FromContext(ctx)
 
-	// TODO(user): your logic here
-
-	return ctrl.Result{}, nil
+	h := handlers.NewRolloutHandler(ctx, r.Client, req, r.app.HookStore)
+	return handlers.RunHandler(l, h)
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *RolloutReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *RolloutReconciler) SetupWithManager(mgr ctrl.Manager, app *app.App) error {
+	r.app = app
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.Rollout{}).
 		Complete(r)

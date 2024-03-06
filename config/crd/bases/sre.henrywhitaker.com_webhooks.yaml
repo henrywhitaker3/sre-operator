@@ -56,12 +56,13 @@ spec:
                 description: Whether the Webhhok configuration is valid and has been
                   processed.
                 type: boolean
+              error:
+                type: string
               id:
                 description: The ID id of the webhook
                 type: string
             required:
             - enabled
-            - id
             type: object
         type: object
     served: true

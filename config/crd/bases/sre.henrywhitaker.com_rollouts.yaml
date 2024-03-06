@@ -41,25 +41,33 @@ spec:
             properties:
               action:
                 type: string
-              kind:
+              hook:
                 type: string
-              name:
-                type: string
-              namespace:
-                type: string
+              target:
+                properties:
+                  kind:
+                    type: string
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                required:
+                - kind
+                - name
+                - namespace
+                type: object
             required:
             - action
-            - kind
-            - name
-            - namespace
+            - hook
+            - target
             type: object
           status:
             description: RolloutStatus defines the observed state of Rollout
             properties:
+              error:
+                type: string
               registered:
                 type: boolean
-            required:
-            - registered
             type: object
         type: object
     served: true

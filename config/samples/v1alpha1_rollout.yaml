@@ -1,4 +1,4 @@
-apiVersion: sre.sre.henrywhitaker.com/v1alpha1
+apiVersion: sre.henrywhitaker.com/v1alpha1
 kind: Rollout
 metadata:
   labels:
@@ -9,4 +9,9 @@ metadata:
     app.kubernetes.io/created-by: sre-operator
   name: rollout-sample
 spec:
-  # TODO(user): Add fields here
+  hook: bongos
+  target:
+    kind: deployment
+    namespace: default
+    name: debug
+  action: restart
