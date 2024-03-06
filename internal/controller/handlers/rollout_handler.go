@@ -16,6 +16,7 @@ import (
 )
 
 var (
+	ErrNoTriggers    = errors.New("no triggers specified")
 	ErrUnknwonHook   = errors.New("unknown hook")
 	ErrUnknwonAction = errors.New("unknown action")
 )
@@ -47,13 +48,8 @@ func (h *RolloutHandler) Get() error {
 }
 
 func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
-	if h.obj.Spec.Hook == "" {
-		return ErrUnknwonHook, false
-	}
-
-	_, ok := h.store.Get(h.obj.Spec.Hook)
-	if !ok {
-		return ErrUnknwonHook, true
+	if len(h.obj.Spec.Triggers) == 0 {
+		return ErrNoTriggers, false
 	}
 
 	var subs webhook.StoreSubscriber
@@ -71,7 +67,13 @@ func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
 		subs = h.throttle(subs)
 	}
 
-	h.store.StoreFunc(h.obj.Spec.Hook, h.obj.Name, subs)
+	for _, t := range h.obj.Spec.Triggers {
+		_, ok := h.store.Get(t)
+		if !ok {
+			return ErrUnknwonHook, true
+		}
+		h.store.StoreFunc(t, h.obj.Name, subs)
+	}
 	return nil, true
 }
 
@@ -137,7 +139,14 @@ func (h *RolloutHandler) throttle(f webhook.StoreSubscriber) webhook.StoreSubscr
 }
 
 func (h *RolloutHandler) Delete() error {
-	return h.store.DropFunc(h.obj.Spec.Hook, h.obj.Name)
+	for _, t := range h.obj.Spec.Triggers {
+		_, ok := h.store.Get(t)
+		if !ok {
+			continue
+		}
+		h.store.DropFunc(t, h.obj.Name)
+	}
+	return nil
 }
 
 func (h *RolloutHandler) DeletionTimestampIsZero() bool {

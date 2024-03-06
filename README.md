@@ -1,114 +1,97 @@
-# sre-operator
-// TODO(user): Add simple overview of use/purpose
+# SRE Operator
 
-## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+Automate repetitive actions using kubernetes.
 
-## Getting Started
+## Overview
 
-### Prerequisites
-- go version v1.21.0+
-- docker version 17.03+.
-- kubectl version v1.11.3+.
-- Access to a Kubernetes v1.11.3+ cluster.
+### Triggers
 
-### To Deploy on the cluster
-**Build and push your image to the location specified by `IMG`:**
+There are 2 ways to trigger an action:
 
-```sh
-make docker-build docker-push IMG=<some-registry>/sre-operator:tag
+#### Webhooks
+
+You can define a webhook resource:
+
+```yaml
+apiVersion: sre.henrywhitaker.com/v1alpha1
+kind: Webhook
+metadata:
+    name: demo-webhook
+spec:
+    id: demo-hook
 ```
 
-**NOTE:** This image ought to be published in the personal registry you specified. 
-And it is required to have access to pull the image from the working environment. 
-Make sure you have the proper permission to the registry if the above commands don’t work.
+Then you can trigger it manually by running:
 
-**Install the CRDs into the cluster:**
-
-```sh
-make install
+```
+curl -X POST {domain}/webhook/demo-hook
 ```
 
-**Deploy the Manager to the cluster with the image specified by `IMG`:**
+Or setup your monitoring/alerting platform to call the webhook when a monitor is triggered.
 
-```sh
-make deploy IMG=<some-registry>/sre-operator:tag
+#### Schedule
+
+You can schedule actions to be triggered based on a cron schedule:
+
+```yaml
+apiVersion: sre.henrywhitaker.com/v1alpha1
+kind: Schedule
+metadata:
+    name: demo-schedule
+spec:
+    id: demo-cron
+    cron: 0 * * * *
 ```
 
-> **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin 
-privileges or be logged in as admin.
+### Actions
 
-**Create instances of your solution**
-You can apply the samples (examples) from the config/sample:
+You can then create actions that subscribe to defined triggers:
 
-```sh
-kubectl apply -k config/samples/
+#### Rollout
+
+You can trigger the equivalent of `kubectl rollout {action} {kind} {name}`:
+
+```yaml
+apiVersion: sre.henrywhitaker.com/v1alpha1
+kind: Rollout
+metadata:
+    name: demo-rollout
+spec:
+    triggers:
+        - demo-hook
+        - demo-cron
+    target:
+        kind: deployment
+        name: coredns
+        namespace: kube-system
+    # The rolout action, one of: restart, pause, resume
+    action: restart
+    # This is an optional field to throttle actions once for
+    # every specified period
+    throttle: 10m
 ```
 
->**NOTE**: Ensure that the samples has default values to test it out.
+#### Script
 
-### To Uninstall
-**Delete the instances (CRs) from the cluster:**
+You can define a script to be run:
 
-```sh
-kubectl delete -k config/samples/
+```yaml
+apiVerison: sre.henrywhitaker.com/v1alpha1
+kind: Script
+metadata:
+    name: demo-script
+spec:
+    triggers:
+        - demo-hook
+        - demo-cron
+    # Optional: specifcy the image to use, defaults to alpine:latest
+    image: alpine:latest
+    # Optional: specify the shell to run the script with, defaults to: /bin/sh
+    shell: /bin/sh
+    script: |
+        echo Demo script!
+    # Optional: define secrets to be mounted to /var/sre/secrets and to populate env with
+    # These must be in the same namespace as the sre-operator
+    secrets:
+        - example-secret
 ```
-
-**Delete the APIs(CRDs) from the cluster:**
-
-```sh
-make uninstall
-```
-
-**UnDeploy the controller from the cluster:**
-
-```sh
-make undeploy
-```
-
-## Project Distribution
-
-Following are the steps to build the installer and distribute this project to users.
-
-1. Build the installer for the image built and published in the registry:
-
-```sh
-make build-installer IMG=<some-registry>/sre-operator:tag
-```
-
-NOTE: The makefile target mentioned above generates an 'install.yaml'
-file in the dist directory. This file contains all the resources built
-with Kustomize, which are necessary to install this project without
-its dependencies.
-
-2. Using the installer
-
-Users can just run kubectl apply -f <URL for YAML BUNDLE> to install the project, i.e.:
-
-```sh
-kubectl apply -f https://raw.githubusercontent.com/<org>/sre-operator/<tag or branch>/dist/install.yaml
-```
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
-
-## License
-
-Copyright 2024.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-
