@@ -5,8 +5,8 @@ import (
 	"errors"
 
 	configurationv1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
-	"github.com/henrywhitaker3/sre-operator/internal/http/webhook"
 	"github.com/henrywhitaker3/sre-operator/internal/metrics"
+	"github.com/henrywhitaker3/sre-operator/internal/store"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -22,13 +22,13 @@ type WebhookHandler struct {
 	req    ctrl.Request
 	obj    *configurationv1alpha1.Webhook
 
-	store   *webhook.Store
+	store   *store.Store
 	metrics *metrics.Metrics
 
 	id string
 }
 
-func NewWebhookHandler(ctx context.Context, client client.Client, req ctrl.Request, store *webhook.Store, metrics *metrics.Metrics) *WebhookHandler {
+func NewWebhookHandler(ctx context.Context, client client.Client, req ctrl.Request, store *store.Store, metrics *metrics.Metrics) *WebhookHandler {
 	return &WebhookHandler{
 		ctx:     ctx,
 		client:  client,

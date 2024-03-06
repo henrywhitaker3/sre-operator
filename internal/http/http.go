@@ -5,6 +5,7 @@ import (
 
 	"github.com/henrywhitaker3/sre-operator/internal/http/webhook"
 	"github.com/henrywhitaker3/sre-operator/internal/metrics"
+	"github.com/henrywhitaker3/sre-operator/internal/store"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -19,7 +20,7 @@ type Route interface {
 	Handler() echo.HandlerFunc
 }
 
-func NewHttp(addr string, store *webhook.Store, metrics *metrics.Metrics) *Http {
+func NewHttp(addr string, store *store.Store, metrics *metrics.Metrics) *Http {
 	h := &Http{
 		echo: echo.New(),
 		addr: addr,

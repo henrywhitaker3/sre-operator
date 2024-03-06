@@ -1,4 +1,4 @@
-package webhook
+package store
 
 import (
 	"context"

@@ -8,16 +8,17 @@ import (
 
 	"github.com/henrywhitaker3/flow"
 	"github.com/henrywhitaker3/sre-operator/internal/metrics"
+	"github.com/henrywhitaker3/sre-operator/internal/store"
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 type WebhookRoute struct {
-	store   *Store
+	store   *store.Store
 	metrics *metrics.Metrics
 }
 
-func NewWebhookRoute(store *Store, metrics *metrics.Metrics) *WebhookRoute {
+func NewWebhookRoute(store *store.Store, metrics *metrics.Metrics) *WebhookRoute {
 	return &WebhookRoute{
 		store:   store,
 		metrics: metrics,
@@ -40,7 +41,7 @@ func (w *WebhookRoute) Handler() echo.HandlerFunc {
 
 		for name, cb := range cbs {
 			fmt.Printf("triggering action %s\n", name)
-			go func(name string, f StoreSubscriber) {
+			go func(name string, f store.StoreSubscriber) {
 				status := "success"
 				if err := f(context.Background()); err != nil {
 					if errors.Is(err, flow.ErrThrottled) {

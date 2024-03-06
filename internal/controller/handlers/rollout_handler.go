@@ -7,7 +7,7 @@ import (
 
 	"github.com/henrywhitaker3/flow"
 	v1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
-	"github.com/henrywhitaker3/sre-operator/internal/http/webhook"
+	"github.com/henrywhitaker3/sre-operator/internal/store"
 	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -26,10 +26,10 @@ type RolloutHandler struct {
 	client client.Client
 	req    ctrl.Request
 	obj    *v1alpha1.Rollout
-	store  *webhook.Store
+	store  *store.Store
 }
 
-func NewRolloutHandler(ctx context.Context, client client.Client, req ctrl.Request, store *webhook.Store) *RolloutHandler {
+func NewRolloutHandler(ctx context.Context, client client.Client, req ctrl.Request, store *store.Store) *RolloutHandler {
 	return &RolloutHandler{
 		ctx:    ctx,
 		client: client,
@@ -52,7 +52,7 @@ func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
 		return ErrNoTriggers, false
 	}
 
-	var subs webhook.StoreSubscriber
+	var subs store.StoreSubscriber
 	switch h.obj.Spec.Action {
 	case "restart":
 		subs = h.buildRestartFunc()
@@ -77,7 +77,7 @@ func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
 	return nil, true
 }
 
-func (h *RolloutHandler) buildRestartFunc() webhook.StoreSubscriber {
+func (h *RolloutHandler) buildRestartFunc() store.StoreSubscriber {
 	return func(ctx context.Context) error {
 		get := func(t client.Object) error {
 			if err := h.client.Get(ctx, types.NamespacedName{
@@ -127,7 +127,7 @@ func (h *RolloutHandler) buildRestartFunc() webhook.StoreSubscriber {
 	}
 }
 
-func (h *RolloutHandler) throttle(f webhook.StoreSubscriber) webhook.StoreSubscriber {
+func (h *RolloutHandler) throttle(f store.StoreSubscriber) store.StoreSubscriber {
 	dur, _ := time.ParseDuration(h.obj.Spec.Throttle)
 	throttle := flow.Throttle[struct{}](func(ctx context.Context) (struct{}, error) {
 		return struct{}{}, f(ctx)
