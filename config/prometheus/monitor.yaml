@@ -14,7 +14,7 @@ metadata:
 spec:
   endpoints:
     - path: /metrics
-      port: http
+      port: metrics
       scheme: http
   selector:
     matchLabels:
