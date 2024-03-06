@@ -61,7 +61,15 @@ spec:
                 type: string
               triggers:
                 items:
-                  type: string
+                  properties:
+                    kind:
+                      type: string
+                    name:
+                      type: string
+                  required:
+                  - kind
+                  - name
+                  type: object
                 type: array
             required:
             - action
