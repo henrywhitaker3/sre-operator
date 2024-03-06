@@ -25,7 +25,6 @@ type WebhookHandler struct {
 	store   *webhook.Store
 	metrics *metrics.Metrics
 
-	// The generated id
 	id string
 }
 
