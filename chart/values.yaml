@@ -17,7 +17,7 @@ controllerManager:
       requests:
         cpu: 10m
         memory: 64Mi
-  replicas: 1
+  replicas: 3
   serviceAccount:
     annotations: {}
 kubernetesClusterDomain: cluster.local
