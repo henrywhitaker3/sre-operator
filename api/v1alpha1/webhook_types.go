@@ -35,7 +35,8 @@ type WebhookStatus struct {
 	// Whether the Webhhok configuration is valid and has been processed.
 	Valid bool `json:"enabled"`
 	// The ID id of the webhook
-	ID string `json:"id"`
+	ID    string `json:"id,omitempty"`
+	Error string `json:"error,omitempty"`
 }
 
 //+kubebuilder:object:root=true

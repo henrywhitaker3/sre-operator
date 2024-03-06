@@ -85,7 +85,7 @@ func (h *WebhookHandler) SuccessStatus() error {
 func (h *WebhookHandler) ErrorStatus(err error) error {
 	h.obj.Status = configurationv1alpha1.WebhookStatus{
 		Valid: false,
-		ID:    h.id,
+		Error: err.Error(),
 	}
 	return h.client.SubResource("status").Update(h.ctx, h.obj)
 }

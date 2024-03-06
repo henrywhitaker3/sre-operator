@@ -26,6 +26,9 @@ import (
 // RolloutSpec defines the desired state of Rollout
 type RolloutSpec struct {
 	//+kubebuilder:validation:Required
+	Hook string `json:"hook"`
+
+	//+kubebuilder:validation:Required
 	//+kubebuilder:validation:Enum:deployment;statefulset;daemonset
 	Kind string `json:"kind"`
 
@@ -42,7 +45,8 @@ type RolloutSpec struct {
 
 // RolloutStatus defines the observed state of Rollout
 type RolloutStatus struct {
-	Registered bool `json:"registered"`
+	Registered bool   `json:"registered"`
+	Error      string `json:"error,omitempty"`
 }
 
 //+kubebuilder:object:root=true
