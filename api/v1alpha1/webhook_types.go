@@ -20,22 +20,23 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // WebhookSpec defines the desired state of Webhook
 type WebhookSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// The path of the webhook. Optional, if you don't specify one
+	// it will be generated for you. If you don't set an ID, then this will
+	// change each time the operator is restarted.
+	ID string `json:"id,omitempty"`
 
-	// Foo is an example field of Webhook. Edit webhook_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// The secret to validate incoming webhooks with. Not implemented yet.
+	Secret string `json:"secret,omitempty"`
 }
 
 // WebhookStatus defines the observed state of Webhook
 type WebhookStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Whether the Webhhok configuration is valid and has been processed.
+	Valid bool `json:"enabled"`
+	// The ID id of the webhook
+	ID string `json:"id"`
 }
 
 //+kubebuilder:object:root=true
