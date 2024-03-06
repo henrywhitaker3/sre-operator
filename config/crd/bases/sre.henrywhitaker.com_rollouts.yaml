@@ -39,13 +39,27 @@ spec:
           spec:
             description: RolloutSpec defines the desired state of Rollout
             properties:
-              foo:
-                description: Foo is an example field of Rollout. Edit rollout_types.go
-                  to remove/update
+              action:
                 type: string
+              kind:
+                type: string
+              name:
+                type: string
+              namespace:
+                type: string
+            required:
+            - action
+            - kind
+            - name
+            - namespace
             type: object
           status:
             description: RolloutStatus defines the observed state of Rollout
+            properties:
+              registered:
+                type: boolean
+            required:
+            - registered
             type: object
         type: object
     served: true

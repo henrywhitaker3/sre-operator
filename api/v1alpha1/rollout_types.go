@@ -25,17 +25,24 @@ import (
 
 // RolloutSpec defines the desired state of Rollout
 type RolloutSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	//+kubebuilder:validation:Required
+	//+kubebuilder:validation:Enum:deployment;statefulset;daemonset
+	Kind string `json:"kind"`
 
-	// Foo is an example field of Rollout. Edit rollout_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	//+kubebuilder:validation:Required
+	Namespace string `json:"namespace"`
+
+	//+kubebuilder:validation:Required
+	Name string `json:"name"`
+
+	//+kubebuilder:validation:Required
+	//+kubebuilder:validation:Enum:pause;restart;resume;undo
+	Action string `json:"action"`
 }
 
 // RolloutStatus defines the observed state of Rollout
 type RolloutStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Registered bool `json:"registered"`
 }
 
 //+kubebuilder:object:root=true

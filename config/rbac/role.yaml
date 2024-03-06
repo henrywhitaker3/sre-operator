@@ -5,6 +5,17 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
+  - apps
+  - extensions
+  resources:
+  - daemonsets
+  - deployments
+  - pods
+  - statefulsets
+  verbs:
+  - get
+  - patch
+- apiGroups:
   - sre.henrywhitaker.com
   resources:
   - rollouts
