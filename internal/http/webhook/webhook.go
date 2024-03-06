@@ -53,9 +53,10 @@ func (w *WebhookRoute) Handler() echo.HandlerFunc {
 				}
 
 				w.metrics.ActionsRun.With(prometheus.Labels{
-					"action":  s.Name,
-					"trigger": hook,
-					"status":  status,
+					"action":     s.Name,
+					"trigger_id": hook,
+					"trigger":    store.WEBHOOK,
+					"status":     status,
 				}).Inc()
 			}(s)
 		}

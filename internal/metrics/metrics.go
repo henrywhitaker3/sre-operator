@@ -15,7 +15,7 @@ type Metrics struct {
 func New() (*Metrics, error) {
 	actionsRunCounter := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "sre_operator_actions_run",
-	}, []string{"action", "trigger", "status"})
+	}, []string{"action", "trigger", "trigger_id", "status"})
 	actionsRegisteredCounter := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name: "sre_operator_actions_registered",
 	}, []string{"type"})
