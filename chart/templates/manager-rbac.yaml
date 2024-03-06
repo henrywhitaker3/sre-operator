@@ -45,6 +45,32 @@ rules:
 - apiGroups:
   - sre.henrywhitaker.com
   resources:
+  - scripts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sre.henrywhitaker.com
+  resources:
+  - scripts/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - sre.henrywhitaker.com
+  resources:
+  - scripts/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sre.henrywhitaker.com
+  resources:
   - webhooks
   verbs:
   - create
