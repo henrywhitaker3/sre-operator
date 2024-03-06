@@ -57,7 +57,15 @@ spec:
               triggers:
                 description: A list of triggers that this script subscribes to
                 items:
-                  type: string
+                  properties:
+                    kind:
+                      type: string
+                    name:
+                      type: string
+                  required:
+                  - kind
+                  - name
+                  type: object
                 type: array
             required:
             - script

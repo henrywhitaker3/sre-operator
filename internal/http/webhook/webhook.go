@@ -32,18 +32,19 @@ func (w *WebhookRoute) Path() string {
 func (w *WebhookRoute) Handler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		hook := c.Param("id")
-		cbs, ok := w.store.Get(hook)
-		if !ok {
+		subs, err := w.store.Get(store.WEBHOOK, hook)
+		if err != nil {
+			fmt.Println(err)
 			return c.NoContent(http.StatusNotFound)
 		}
 
 		w.metrics.WebhooksCalled.With(prometheus.Labels{"id": hook}).Inc()
 
-		for name, cb := range cbs {
-			fmt.Printf("triggering action %s\n", name)
-			go func(name string, f store.StoreSubscriber) {
+		for _, s := range subs {
+			fmt.Printf("triggering action %s\n", s.Name)
+			go func(s store.Subscription) {
 				status := "success"
-				if err := f(context.Background()); err != nil {
+				if err := s.Do(context.Background()); err != nil {
 					if errors.Is(err, flow.ErrThrottled) {
 						status = "throttled"
 					} else {
@@ -52,11 +53,11 @@ func (w *WebhookRoute) Handler() echo.HandlerFunc {
 				}
 
 				w.metrics.ActionsRun.With(prometheus.Labels{
-					"action":  name,
+					"action":  s.Name,
 					"trigger": hook,
 					"status":  status,
 				}).Inc()
-			}(name, cb)
+			}(s)
 		}
 
 		return c.NoContent(http.StatusOK)

@@ -53,18 +53,19 @@ func (h *WebhookHandler) CreateOrUpdate() (error, bool) {
 	}
 	h.id = h.obj.Spec.ID
 
-	if ok, _ := h.store.Get(h.id); ok == nil {
-		h.metrics.WebhooksRegistered.Inc()
+	if _, err := h.store.Get(store.WEBHOOK, h.id); err != nil {
+		if errors.Is(err, store.ErrUnknownTrigger) {
+			h.metrics.WebhooksRegistered.Inc()
+		} else {
+			return err, false
+		}
 	}
 
-	h.store.Store(h.id)
-
-	return nil, true
+	return h.store.Register(store.WEBHOOK, h.id), true
 }
 
 func (h *WebhookHandler) Delete() error {
-	h.store.Drop(h.id)
-	return nil
+	return h.store.Drop(store.WEBHOOK, h.id)
 }
 
 func (h *WebhookHandler) DeletionTimestampIsZero() bool {

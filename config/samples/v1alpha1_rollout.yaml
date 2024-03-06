@@ -9,8 +9,9 @@ metadata:
     app.kubernetes.io/created-by: sre-operator
   name: rollout-sample
 spec:
-  triggers: 
-    - bongos
+  triggers:
+    - name: bongos
+      kind: webhook
   target:
     kind: deployment
     namespace: kube-system

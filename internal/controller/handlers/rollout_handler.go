@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	v1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
@@ -68,11 +69,17 @@ func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
 	}
 
 	for _, t := range h.obj.Spec.Triggers {
-		_, ok := h.store.Get(t)
-		if !ok {
-			return ErrUnknwonHook, true
+		fmt.Printf("subscribing %s to %s:%s\n", h.obj.Name, t.Kind, t.Name)
+		if err := h.store.Subscibe(
+			t.Kind,
+			t.Name,
+			store.Subscription{
+				Name: h.obj.Name,
+				Do:   subs,
+			},
+		); err != nil {
+			return err, true
 		}
-		h.store.StoreFunc(t, h.obj.Name, subs)
 	}
 	return nil, true
 }
@@ -129,11 +136,9 @@ func (h *RolloutHandler) buildRestartFunc() store.StoreSubscriber {
 
 func (h *RolloutHandler) Delete() error {
 	for _, t := range h.obj.Spec.Triggers {
-		_, ok := h.store.Get(t)
-		if !ok {
-			continue
+		if err := h.store.Unsubscribe(t.Kind, t.Name, store.Subscription{Name: h.obj.Name}); err != nil {
+			return err
 		}
-		h.store.DropFunc(t, h.obj.Name)
 	}
 	return nil
 }

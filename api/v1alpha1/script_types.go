@@ -24,7 +24,7 @@ import (
 type ScriptSpec struct {
 	//+kubebuilder:validation:Required
 	// A list of triggers that this script subscribes to
-	Triggers []string `json:"triggers"`
+	Triggers []Trigger `json:"triggers"`
 
 	//+kubebuilder:validation:Required
 	// The script to run when triggered

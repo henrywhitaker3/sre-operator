@@ -35,7 +35,7 @@ type TargetSpec struct {
 // RolloutSpec defines the desired state of Rollout
 type RolloutSpec struct {
 	//+kubebuilder:validation:Required
-	Triggers []string `json:"triggers"`
+	Triggers []Trigger `json:"triggers"`
 
 	//+kubebuilder:validation:Required
 	Target TargetSpec `json:"target"`

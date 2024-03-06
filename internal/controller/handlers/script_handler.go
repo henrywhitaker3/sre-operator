@@ -37,32 +37,32 @@ func (h *ScriptHandler) Get() error {
 }
 
 func (h *ScriptHandler) CreateOrUpdate() (error, bool) {
-	if len(h.obj.Spec.Triggers) == 0 {
-		return ErrNoTriggers, false
-	}
+	// if len(h.obj.Spec.Triggers) == 0 {
+	// 	return ErrNoTriggers, false
+	// }
 
-	var subs store.StoreSubscriber
+	// var subs store.StoreSubscriber
 
-	// TODO: implement it pls
+	// // TODO: implement it pls
 
-	for _, t := range h.obj.Spec.Triggers {
-		_, ok := h.store.Get(t)
-		if !ok {
-			return ErrUnknwonHook, true
-		}
-		h.store.StoreFunc(t, h.obj.Name, subs)
-	}
+	// for _, t := range h.obj.Spec.Triggers {
+	// 	_, ok := h.store.Get(t)
+	// 	if !ok {
+	// 		return ErrUnknwonHook, true
+	// 	}
+	// 	h.store.StoreFunc(t, h.obj.Name, subs)
+	// }
 	return nil, true
 }
 
 func (h *ScriptHandler) Delete() error {
-	for _, t := range h.obj.Spec.Triggers {
-		_, ok := h.store.Get(t)
-		if !ok {
-			continue
-		}
-		h.store.DropFunc(t, h.obj.Name)
-	}
+	// for _, t := range h.obj.Spec.Triggers {
+	// 	_, ok := h.store.Get(t)
+	// 	if !ok {
+	// 		continue
+	// 	}
+	// 	h.store.DropFunc(t, h.obj.Name)
+	// }
 	return nil
 }
 
