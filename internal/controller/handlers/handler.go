@@ -1,7 +1,12 @@
 package handlers
 
 import (
+	"context"
+	"time"
+
 	"github.com/go-logr/logr"
+	"github.com/henrywhitaker3/flow"
+	"github.com/henrywhitaker3/sre-operator/internal/store"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -74,4 +79,14 @@ func containsString(slice []string, s string) bool {
 		}
 	}
 	return false
+}
+
+func throttle(f store.StoreSubscriber, d time.Duration) store.StoreSubscriber {
+	throttle := flow.Throttle[struct{}](func(ctx context.Context) (struct{}, error) {
+		return struct{}{}, f(ctx)
+	}, d)
+	return func(ctx context.Context) error {
+		_, err := throttle(ctx)
+		return err
+	}
 }

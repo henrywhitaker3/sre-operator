@@ -50,6 +50,10 @@ spec:
                 type: array
               shell:
                 type: string
+              throttle:
+                description: Throttle the action to 1 time per specified duration
+                  e.g. 5m, 1h
+                type: string
               triggers:
                 description: A list of triggers that this script subscribes to
                 items:

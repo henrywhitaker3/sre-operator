@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/henrywhitaker3/flow"
 	v1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
 	"github.com/henrywhitaker3/sre-operator/internal/store"
 	appsv1 "k8s.io/api/apps/v1"
@@ -61,10 +60,11 @@ func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
 	}
 
 	if h.obj.Spec.Throttle != "" {
-		if _, err := time.ParseDuration(h.obj.Spec.Throttle); err != nil {
+		d, err := time.ParseDuration(h.obj.Spec.Throttle)
+		if err != nil {
 			return err, false
 		}
-		subs = h.throttle(subs)
+		subs = throttle(subs, d)
 	}
 
 	for _, t := range h.obj.Spec.Triggers {
@@ -124,17 +124,6 @@ func (h *RolloutHandler) buildRestartFunc() store.StoreSubscriber {
 		}
 
 		return h.client.Patch(ctx, target, client.Merge)
-	}
-}
-
-func (h *RolloutHandler) throttle(f store.StoreSubscriber) store.StoreSubscriber {
-	dur, _ := time.ParseDuration(h.obj.Spec.Throttle)
-	throttle := flow.Throttle[struct{}](func(ctx context.Context) (struct{}, error) {
-		return struct{}{}, f(ctx)
-	}, dur)
-	return func(ctx context.Context) error {
-		_, err := throttle(ctx)
-		return err
 	}
 }
 

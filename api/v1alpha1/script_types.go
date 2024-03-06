@@ -38,6 +38,10 @@ type ScriptSpec struct {
 
 	//+kubebuilder:validation:Optional
 	Secrets []string `json:"secrets,omitempty"`
+
+	//+kubebuilder:validation:Optional
+	// Throttle the action to 1 time per specified duration e.g. 5m, 1h
+	Throttle string `json:"throttle,omitempty"`
 }
 
 // ScriptStatus defines the observed state of Script
