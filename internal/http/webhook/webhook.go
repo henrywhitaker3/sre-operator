@@ -2,9 +2,11 @@ package webhook
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
+	"github.com/henrywhitaker3/flow"
 	"github.com/labstack/echo/v4"
 )
 
@@ -34,6 +36,10 @@ func (w *WebhookRoute) Handler() echo.HandlerFunc {
 			fmt.Printf("triggering action %s\n", name)
 			go func(f StoreSubscriber) {
 				if err := f(context.Background()); err != nil {
+					if errors.Is(err, flow.ErrThrottled) {
+						fmt.Println("throttled")
+						return
+					}
 					fmt.Println(err)
 				}
 			}(cb)

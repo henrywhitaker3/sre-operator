@@ -15,3 +15,4 @@ spec:
     namespace: kube-system
     name: coredns
   action: restart
+  throttle: 30s

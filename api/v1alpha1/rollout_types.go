@@ -43,6 +43,10 @@ type RolloutSpec struct {
 	//+kubebuilder:validation:Required
 	//+kubebuilder:validation:Enum:pause;restart;resume;undo
 	Action string `json:"action"`
+
+	//+kubebuilder:validation:Optional
+	// Throttle the action to 1 time per specified duration e.g. 5m, 1h
+	Throttle string `json:"throttle,omitempty"`
 }
 
 // RolloutStatus defines the observed state of Rollout

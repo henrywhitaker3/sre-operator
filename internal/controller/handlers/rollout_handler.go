@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/henrywhitaker3/flow"
 	v1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
 	"github.com/henrywhitaker3/sre-operator/internal/http/webhook"
 	appsv1 "k8s.io/api/apps/v1"
@@ -55,13 +56,22 @@ func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
 		return ErrUnknwonHook, true
 	}
 
+	var subs webhook.StoreSubscriber
 	switch h.obj.Spec.Action {
 	case "restart":
-		h.store.StoreFunc(h.obj.Spec.Hook, h.obj.Name, h.buildRestartFunc())
+		subs = h.buildRestartFunc()
 	default:
 		return ErrUnknwonAction, false
 	}
 
+	if h.obj.Spec.Throttle != "" {
+		if _, err := time.ParseDuration(h.obj.Spec.Throttle); err != nil {
+			return err, false
+		}
+		subs = h.throttle(subs)
+	}
+
+	h.store.StoreFunc(h.obj.Spec.Hook, h.obj.Name, subs)
 	return nil, true
 }
 
@@ -112,6 +122,17 @@ func (h *RolloutHandler) buildRestartFunc() webhook.StoreSubscriber {
 		}
 
 		return h.client.Patch(ctx, target, client.Merge)
+	}
+}
+
+func (h *RolloutHandler) throttle(f webhook.StoreSubscriber) webhook.StoreSubscriber {
+	dur, _ := time.ParseDuration(h.obj.Spec.Throttle)
+	throttle := flow.Throttle[struct{}](func(ctx context.Context) (struct{}, error) {
+		return struct{}{}, f(ctx)
+	}, dur)
+	return func(ctx context.Context) error {
+		_, err := throttle(ctx)
+		return err
 	}
 }
 
