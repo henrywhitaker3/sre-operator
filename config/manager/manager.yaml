@@ -45,7 +45,7 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: controller:latest
+        image: ghcr.io/henrywhitaker3/sre-operator:latest
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
