@@ -54,7 +54,7 @@ func (h *WebhookHandler) CreateOrUpdate() (error, bool) {
 	}
 	h.id = h.obj.Spec.ID
 
-	if ok, _ := h.store.Get(h.id); ok != nil {
+	if ok, _ := h.store.Get(h.id); ok == nil {
 		h.metrics.WebhooksRegistered.Inc()
 	}
 
