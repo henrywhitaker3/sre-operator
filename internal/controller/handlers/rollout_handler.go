@@ -15,7 +15,8 @@ import (
 )
 
 var (
-	ErrUnknwonHook = errors.New("unknown hook")
+	ErrUnknwonHook   = errors.New("unknown hook")
+	ErrUnknwonAction = errors.New("unknown action")
 )
 
 type RolloutHandler struct {
@@ -54,12 +55,17 @@ func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
 		return ErrUnknwonHook, true
 	}
 
-	h.store.StoreFunc(h.obj.Spec.Hook, h.obj.Name, h.buildRolloutFunc())
+	switch h.obj.Spec.Action {
+	case "restart":
+		h.store.StoreFunc(h.obj.Spec.Hook, h.obj.Name, h.buildRestartFunc())
+	default:
+		return ErrUnknwonAction, false
+	}
 
 	return nil, true
 }
 
-func (h *RolloutHandler) buildRolloutFunc() webhook.StoreSubscriber {
+func (h *RolloutHandler) buildRestartFunc() webhook.StoreSubscriber {
 	return func(ctx context.Context) error {
 		get := func(t client.Object) error {
 			if err := h.client.Get(ctx, types.NamespacedName{
