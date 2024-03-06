@@ -1,4 +1,4 @@
-version: v1.0.4
+version: v1.0.5
 
 image: ghcr.io/henrywhitaker3/sre-operator
 
