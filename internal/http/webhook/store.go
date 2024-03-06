@@ -36,10 +36,6 @@ func (s *Store) StoreFunc(hook string, name string, f StoreSubscriber) {
 		s.hooks[hook] = make(map[string]StoreSubscriber)
 	}
 
-	if _, ok := s.hooks[hook][name]; ok {
-		return
-	}
-
 	if f == nil {
 		return
 	}

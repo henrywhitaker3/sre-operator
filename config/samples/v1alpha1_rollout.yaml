@@ -12,6 +12,6 @@ spec:
   hook: bongos
   target:
     kind: deployment
-    namespace: default
-    name: debug
+    namespace: kube-system
+    name: coredns
   action: restart

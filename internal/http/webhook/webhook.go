@@ -1,6 +1,7 @@
 package webhook
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -29,8 +30,13 @@ func (w *WebhookRoute) Handler() echo.HandlerFunc {
 			return c.NoContent(http.StatusNotFound)
 		}
 
-		for name := range cbs {
+		for name, cb := range cbs {
 			fmt.Printf("triggering action %s\n", name)
+			go func(f StoreSubscriber) {
+				if err := f(context.Background()); err != nil {
+					fmt.Println(err)
+				}
+			}(cb)
 		}
 
 		return c.NoContent(http.StatusOK)

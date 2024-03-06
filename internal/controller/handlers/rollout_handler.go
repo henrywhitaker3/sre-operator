@@ -61,26 +61,50 @@ func (h *RolloutHandler) CreateOrUpdate() (error, bool) {
 
 func (h *RolloutHandler) buildRolloutFunc() webhook.StoreSubscriber {
 	return func(ctx context.Context) error {
+		get := func(t client.Object) error {
+			if err := h.client.Get(ctx, types.NamespacedName{
+				Namespace: h.obj.Spec.Target.Namespace,
+				Name:      h.obj.Spec.Target.Name,
+			}, t); err != nil {
+				return err
+			}
+			return nil
+		}
+
 		var target client.Object
 		switch h.obj.Spec.Target.Kind {
 		case "deployment":
-			target = &appsv1.Deployment{}
+			t := &appsv1.Deployment{}
+			if err := get(t); err != nil {
+				return err
+			}
+			if t.Spec.Template.Annotations == nil {
+				t.Spec.Template.Annotations = make(map[string]string)
+			}
+			t.Spec.Template.Annotations["kubectl.kubernetes.io/restartedAt"] = time.Now().Format(time.RFC3339)
+			target = t
 		case "daemonset":
-			target = &appsv1.DaemonSet{}
+			t := &appsv1.DaemonSet{}
+			if err := get(t); err != nil {
+				return err
+			}
+			if t.Spec.Template.Annotations == nil {
+				t.Spec.Template.Annotations = make(map[string]string)
+			}
+			t.Spec.Template.Annotations["kubectl.kubernetes.io/restartedAt"] = time.Now().Format(time.RFC3339)
+			target = t
 		case "statefulset":
-			target = &appsv1.StatefulSet{}
+			t := &appsv1.StatefulSet{}
+			if err := get(t); err != nil {
+				return err
+			}
+			if t.Spec.Template.Annotations == nil {
+				t.Spec.Template.Annotations = make(map[string]string)
+			}
+			t.Spec.Template.Annotations["kubectl.kubernetes.io/restartedAt"] = time.Now().Format(time.RFC3339)
+			target = t
 		}
 
-		if err := h.client.Get(ctx, types.NamespacedName{
-			Namespace: h.obj.Spec.Target.Namespace,
-			Name:      h.obj.Spec.Target.Name,
-		}, target); err != nil {
-			return err
-		}
-
-		annos := target.GetAnnotations()
-		annos["kubectl.kubernetes.io/restartedAt"] = time.Now().Format(time.RFC3339)
-		target.SetAnnotations(annos)
 		return h.client.Patch(ctx, target, client.Merge)
 	}
 }
