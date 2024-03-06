@@ -7,16 +7,20 @@ import (
 	"net/http"
 
 	"github.com/henrywhitaker3/flow"
+	"github.com/henrywhitaker3/sre-operator/internal/metrics"
 	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type WebhookRoute struct {
-	store *Store
+	store   *Store
+	metrics *metrics.Metrics
 }
 
-func NewWebhookRoute(store *Store) *WebhookRoute {
+func NewWebhookRoute(store *Store, metrics *metrics.Metrics) *WebhookRoute {
 	return &WebhookRoute{
-		store: store,
+		store:   store,
+		metrics: metrics,
 	}
 }
 
@@ -32,17 +36,26 @@ func (w *WebhookRoute) Handler() echo.HandlerFunc {
 			return c.NoContent(http.StatusNotFound)
 		}
 
+		w.metrics.WebhooksCalled.With(prometheus.Labels{"id": hook}).Inc()
+
 		for name, cb := range cbs {
 			fmt.Printf("triggering action %s\n", name)
-			go func(f StoreSubscriber) {
+			go func(name string, f StoreSubscriber) {
+				status := "success"
 				if err := f(context.Background()); err != nil {
 					if errors.Is(err, flow.ErrThrottled) {
-						fmt.Println("throttled")
-						return
+						status = "throttled"
+					} else {
+						fmt.Println(err)
 					}
-					fmt.Println(err)
 				}
-			}(cb)
+
+				w.metrics.ActionsRun.With(prometheus.Labels{
+					"action":  name,
+					"trigger": hook,
+					"status":  status,
+				}).Inc()
+			}(name, cb)
 		}
 
 		return c.NoContent(http.StatusOK)

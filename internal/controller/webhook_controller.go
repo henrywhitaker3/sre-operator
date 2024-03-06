@@ -44,7 +44,7 @@ type WebhookReconciler struct {
 func (r *WebhookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 
-	h := handlers.NewWebhookHandler(ctx, r.Client, req, r.app.HookStore)
+	h := handlers.NewWebhookHandler(ctx, r.Client, req, r.app.HookStore, r.app.Metrics)
 	res, err := handlers.RunHandler(l, h)
 	if err != nil {
 		l.Error(err, "webhook handler error")

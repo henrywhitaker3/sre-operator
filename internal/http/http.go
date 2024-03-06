@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/henrywhitaker3/sre-operator/internal/http/webhook"
+	"github.com/henrywhitaker3/sre-operator/internal/metrics"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -18,7 +19,7 @@ type Route interface {
 	Handler() echo.HandlerFunc
 }
 
-func NewHttp(addr string, store *webhook.Store) *Http {
+func NewHttp(addr string, store *webhook.Store, metrics *metrics.Metrics) *Http {
 	h := &Http{
 		echo: echo.New(),
 		addr: addr,
@@ -26,7 +27,7 @@ func NewHttp(addr string, store *webhook.Store) *Http {
 
 	h.echo.HideBanner = true
 	h.echo.Use(middleware.Logger())
-	h.POST(webhook.NewWebhookRoute(store))
+	h.POST(webhook.NewWebhookRoute(store, metrics))
 
 	return h
 }

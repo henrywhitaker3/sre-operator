@@ -6,6 +6,7 @@ import (
 
 	configurationv1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
 	"github.com/henrywhitaker3/sre-operator/internal/http/webhook"
+	"github.com/henrywhitaker3/sre-operator/internal/metrics"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -20,18 +21,21 @@ type WebhookHandler struct {
 	client client.Client
 	req    ctrl.Request
 	obj    *configurationv1alpha1.Webhook
-	store  *webhook.Store
+
+	store   *webhook.Store
+	metrics *metrics.Metrics
 
 	// The generated id
 	id string
 }
 
-func NewWebhookHandler(ctx context.Context, client client.Client, req ctrl.Request, store *webhook.Store) *WebhookHandler {
+func NewWebhookHandler(ctx context.Context, client client.Client, req ctrl.Request, store *webhook.Store, metrics *metrics.Metrics) *WebhookHandler {
 	return &WebhookHandler{
-		ctx:    ctx,
-		client: client,
-		req:    req,
-		store:  store,
+		ctx:     ctx,
+		client:  client,
+		req:     req,
+		store:   store,
+		metrics: metrics,
 	}
 }
 
@@ -50,13 +54,17 @@ func (h *WebhookHandler) CreateOrUpdate() (error, bool) {
 	}
 	h.id = h.obj.Spec.ID
 
+	if ok, _ := h.store.Get(h.id); ok != nil {
+		h.metrics.WebhooksRegistered.Inc()
+	}
+
 	h.store.Store(h.id)
 
 	return nil, true
 }
 
 func (h *WebhookHandler) Delete() error {
-	// TODO: remove echo config
+	h.store.Drop(h.id)
 	return nil
 }
 
