@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	srev1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
+	v1alpha1 "github.com/henrywhitaker3/sre-operator/api/v1alpha1"
 )
 
 // RolloutReconciler reconciles a Rollout object
@@ -33,9 +33,9 @@ type RolloutReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=sre.sre.henrywhitaker.com,resources=rollouts,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=sre.sre.henrywhitaker.com,resources=rollouts/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=sre.sre.henrywhitaker.com,resources=rollouts/finalizers,verbs=update
+//+kubebuilder:rbac:groups=sre.henrywhitaker.com,resources=rollouts,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=sre.henrywhitaker.com,resources=rollouts/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=sre.henrywhitaker.com,resources=rollouts/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -57,6 +57,6 @@ func (r *RolloutReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 // SetupWithManager sets up the controller with the Manager.
 func (r *RolloutReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&srev1alpha1.Rollout{}).
+		For(&v1alpha1.Rollout{}).
 		Complete(r)
 }

@@ -37,9 +37,9 @@ type WebhookReconciler struct {
 	app    *app.App
 }
 
-//+kubebuilder:rbac:groups=sre.sre.henrywhitaker.com,resources=webhooks,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=sre.sre.henrywhitaker.com,resources=webhooks/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=sre.sre.henrywhitaker.com,resources=webhooks/finalizers,verbs=update
+//+kubebuilder:rbac:groups=sre.henrywhitaker.com,resources=webhooks,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=sre.henrywhitaker.com,resources=webhooks/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=sre.henrywhitaker.com,resources=webhooks/finalizers,verbs=update
 
 func (r *WebhookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)

@@ -12,7 +12,7 @@ metadata:
   name: rollout-editor-role
 rules:
 - apiGroups:
-  - sre.sre.henrywhitaker.com
+  - sre.henrywhitaker.com
   resources:
   - rollouts
   verbs:
@@ -24,7 +24,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - sre.sre.henrywhitaker.com
+  - sre.henrywhitaker.com
   resources:
   - rollouts/status
   verbs:

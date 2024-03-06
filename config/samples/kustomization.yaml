@@ -1,5 +1,5 @@
 ## Append samples of your project ##
 resources:
 - v1alpha1_webhook.yaml
-- sre_v1alpha1_rollout.yaml
+- v1alpha1_rollout.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

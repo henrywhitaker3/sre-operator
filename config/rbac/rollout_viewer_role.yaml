@@ -12,7 +12,7 @@ metadata:
   name: rollout-viewer-role
 rules:
 - apiGroups:
-  - sre.sre.henrywhitaker.com
+  - sre.henrywhitaker.com
   resources:
   - rollouts
   verbs:
@@ -20,7 +20,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - sre.sre.henrywhitaker.com
+  - sre.henrywhitaker.com
   resources:
   - rollouts/status
   verbs:

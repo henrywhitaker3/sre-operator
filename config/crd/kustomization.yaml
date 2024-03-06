@@ -3,7 +3,7 @@
 # It should be run by config/default
 resources:
 - bases/sre.henrywhitaker.com_webhooks.yaml
-- bases/sre.sre.henrywhitaker.com_rollouts.yaml
+- bases/sre.henrywhitaker.com_rollouts.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patches:
