@@ -5,7 +5,7 @@ go 1.21.6
 toolchain go1.22.0
 
 require (
-	github.com/go-logr/logr v1.4.1
+	github.com/go-logr/logr v1.4.3
 	github.com/henrywhitaker3/flow v1.2.0
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/onsi/ginkgo/v2 v2.14.0
