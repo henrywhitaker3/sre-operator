@@ -1,12 +1,10 @@
 module github.com/henrywhitaker3/sre-operator
 
-go 1.21.6
-
-toolchain go1.22.0
+go 1.22.2
 
 require (
 	github.com/go-logr/logr v1.4.1
-	github.com/henrywhitaker3/flow v1.2.0
+	github.com/henrywhitaker3/flow v1.11.1
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/onsi/ginkgo/v2 v2.14.0
 	github.com/onsi/gomega v1.30.0
