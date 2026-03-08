@@ -2,7 +2,7 @@ module github.com/henrywhitaker3/sre-operator
 
 go 1.21.6
 
-toolchain go1.22.0
+toolchain go1.26.1
 
 require (
 	github.com/go-logr/logr v1.4.1
